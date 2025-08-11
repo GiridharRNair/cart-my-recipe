@@ -20,9 +20,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class RecipeRequest(BaseModel):
     html: str
     url: str
+
 
 @app.post("/parse-recipe")
 async def parse_recipe(request: RecipeRequest):
@@ -34,7 +36,5 @@ async def parse_recipe(request: RecipeRequest):
     return {
         "title": scraper.title(),
         "ingredients": scraper.ingredients(),
-        "instructions": scraper.instructions()
+        "instructions": scraper.instructions(),
     }
-
-
