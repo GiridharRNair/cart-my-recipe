@@ -12,7 +12,7 @@ Instacart uses the product name as a search term to find a matching product.
 Guidelines:
 - Use the typical name the item is sold under in grocery stores.
 - Only include specific variants (e.g., "Fat-Free Greek Yogurt", "Sugar-Free Ketchup") if that is how the product is actually labeled and sold.
-- Avoid adding unnecessary descriptors unless they reflect how the product is officially marketed.
+- Avoid adding unnecessary adjectives unless they reflect how the product is officially marketed.
 - Prioritize clarity and searchability over technical correctness.
 
 
@@ -95,12 +95,14 @@ Display Text Instructions
 
 Create a clean, user-friendly ingredient name for display.
 The title of the matched ingredient to be displayed in the search results and ingredient list. 
+Do not include units in the display text.
 
 Guidelines:
 - Make it natural and readable, like how a person would expect to see it on a recipe or grocery list.
 - You can include common variants if they make it more helpful (e.g., "Fat-Free Greek Yogurt", "Sugar-Free Ketchup").
 - Do not overcomplicate with technical or brand terms unless it's necessary for clarity.
 - Capitalize normally (e.g., "Chicken Breast", not "chicken breast" or "CHICKEN BREAST").
+- Avoid adding unnecessary adjectives unless they reflect how the product is officially marketed.
 - Keep it concise but clear.
 
 
@@ -113,7 +115,7 @@ Never add UPCs
 
 Line Item Measurements Instructions
 
-Optional measurement units used to specify the ingredient quantity in multiple ways. 
+Optional measurement units used to specify the ingredient quantity in multiple ways other than measurement specified in the unit and quantity field. 
 If this is not provided, the 'unit' and 'quantity' fields will be used.
 
 
