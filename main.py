@@ -1,5 +1,5 @@
-import json
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from recipe_scrapers import scrape_html
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,23 +20,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/parse")
-async def parse(request: Request):
-    body = await request.body()
-    try:
-        data = json.loads(body)
-    except json.JSONDecodeError:
-        return {"error": "Invalid JSON"}
-    html = data.get("html")
-    url = data.get("url")
+class RecipeRequest(BaseModel):
+    html: str
+    url: str
 
-    scraper = scrape_html(html, org_url=url)
+@app.post("/parse-recipe")
+async def parse_recipe(request: RecipeRequest):
+    scraper = scrape_html(html=request.html, org_url=request.url)
+
+    if not scraper.ingredients():
+        raise HTTPException(status_code=400, detail="No ingredients found.")
+
     return {
         "title": scraper.title(),
         "ingredients": scraper.ingredients(),
         "instructions": scraper.instructions()
     }
 
-@app.post("/valid-recipe")
-async def valid_recipe(request: Request):
-    pass
+

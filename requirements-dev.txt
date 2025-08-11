@@ -1,0 +1,2 @@
+fastapi[standard]==0.116.1
+recipe-scrapers==15.9.0
