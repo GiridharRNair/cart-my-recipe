@@ -1,33 +1,52 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# React + Vite + CRXJS
 
-## Getting Started
+This template helps you quickly start developing Chrome extensions with React, TypeScript and Vite. It includes the CRXJS Vite plugin for seamless Chrome extension development.
 
-First, run the development server:
+## Features
+
+- React with TypeScript
+- TypeScript support
+- Vite build tool
+- CRXJS Vite plugin integration
+- Chrome extension manifest configuration
+
+## Quick Start
+
+1. Install dependencies:
 
 ```bash
-pnpm dev
-# or
+npm install
+```
+
+2. Start development server:
+
+```bash
 npm run dev
 ```
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+3. Open Chrome and navigate to `chrome://extensions/`, enable "Developer mode", and load the unpacked extension from the `dist` directory.
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
-
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
-
-## Making production build
-
-Run the following:
+4. Build for production:
 
 ```bash
-pnpm build
-# or
 npm run build
 ```
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
+## Project Structure
 
-## Submit to the webstores
+- `src/popup/` - Extension popup UI
+- `src/content/` - Content scripts
+- `manifest.config.ts` - Chrome extension manifest configuration
 
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+## Documentation
+
+- [React Documentation](https://reactjs.org/)
+- [Vite Documentation](https://vitejs.dev/)
+- [CRXJS Documentation](https://crxjs.dev/vite-plugin)
+
+## Chrome Extension Development Notes
+
+- Use `manifest.config.ts` to configure your extension
+- The CRXJS plugin automatically handles manifest generation
+- Content scripts should be placed in `src/content/`
+- Popup UI should be placed in `src/popup/`
