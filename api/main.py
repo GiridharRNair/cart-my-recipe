@@ -139,13 +139,13 @@ async def instacart_shopping_list(request: InstacartShoppingList):
 
     if not request.ingredients:
         raise HTTPException(status_code=400, detail="No ingredients provided.")
-    
+
     request = request.model_dump(exclude_none=True)
 
     payload = {
         "title": request["title"],
         "instructions": request["instructions"],
-        "line_items": request["ingredients"]
+        "line_items": request["ingredients"],
     }
 
     headers = {
