@@ -4,6 +4,7 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
+        "api": "fastapi dev api/main.py",
         "format": "prettier --write . --tab-width 4",
         "dev": "vite",
         "build": "tsc -b && vite build",
