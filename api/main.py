@@ -68,6 +68,7 @@ class InstacartShoppingList(BaseModel):
     title: str
     instructions: List[str]
     ingredients: List[LineItem]
+    image_url: Optional[str] = None
 
 
 @app.post("/parse-recipe")
@@ -81,6 +82,7 @@ async def parse_recipe(request: RecipeRequest):
         "title": scraper.title(),
         "ingredients": scraper.ingredients(),
         "instructions": scraper.instructions(),
+        "image_url": scraper.image(),
     }
 
 
@@ -93,16 +95,19 @@ async def instacart_ingredients(request: RawIngredients):
         system_prompt = f.read()
     user_prompt = f"Input:\n{request.ingredients}"
 
-    response = client.responses.parse(
-        model="gpt-4o-mini-2024-07-18",
-        input=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        text_format=InstacartIngredients,
-    )
+    try:
+        response = client.responses.parse(
+            model="gpt-4o-mini-2024-07-18",
+            input=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            text_format=InstacartIngredients,
+        )
 
-    return response.output_parsed
+        return response.output_parsed
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/instacart-instructions")
@@ -116,17 +121,18 @@ async def instacart_instructions(request: RawInstructions):
     Try to limit guessing.
     """
     user_prompt = f"Input:\n{request.instructions}"
-
-    response = client.responses.parse(
-        model="gpt-5-nano-2025-08-07",
-        input=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        text_format=InstacartInstructions,
-    )
-
-    return response.output_parsed
+    try:
+        response = client.responses.parse(
+            model="gpt-4o-mini-2024-07-18",
+            input=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            text_format=InstacartInstructions,
+        )
+        return response.output_parsed
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/instacart-shopping-list")
@@ -146,6 +152,7 @@ async def instacart_shopping_list(request: InstacartShoppingList):
         "title": request["title"],
         "instructions": request["instructions"],
         "line_items": request["ingredients"],
+        "image_url": request["image_url"],
     }
 
     headers = {
@@ -153,13 +160,13 @@ async def instacart_shopping_list(request: InstacartShoppingList):
         "Authorization": f"Bearer {instacart_api_key}",
     }
 
-    response = requests.post(
-        f"{instacart_server}/idp/v1/products/products_link",
-        json=payload,
-        headers=headers,
-    )
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=response.text)
-
-    return response.json()
+    try:
+        response = requests.post(
+            f"{instacart_server}/idp/v1/products/products_link",
+            json=payload,
+            headers=headers,
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=str(e))
