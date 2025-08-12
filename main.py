@@ -10,6 +10,8 @@ import requests
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+instacart_server = os.getenv("INSTACART_SERVER")
+instacart_api_key = os.getenv("INSTACART_API_KEY")
 app = FastAPI()
 
 app.add_middleware(
@@ -64,6 +66,7 @@ class RawInstructions(BaseModel):
 
 class InstacartShoppingList(BaseModel):
     title: str
+    instructions: List[str]
     ingredients: List[LineItem]
 
 
@@ -86,7 +89,7 @@ async def instacart_ingredients(request: RawIngredients):
     if not request.ingredients:
         raise HTTPException(status_code=400, detail="No ingredients provided.")
 
-    with open("llm_prompt.txt", "r") as f:
+    with open("instacart_ingredients_llm_prompt.txt", "r") as f:
         system_prompt = f.read()
     user_prompt = f"Input:\n{request.ingredients}"
 
@@ -127,5 +130,36 @@ async def instacart_instructions(request: RawInstructions):
 
 
 @app.post("/instacart-shopping-list")
-async def instacart_shopping_list(request: InstacartIngredients):
-    pass
+async def instacart_shopping_list(request: InstacartShoppingList):
+    if not request.title:
+        raise HTTPException(status_code=400, detail="No title provided.")
+
+    if not request.instructions:
+        raise HTTPException(status_code=400, detail="No instructions provided.")
+
+    if not request.ingredients:
+        raise HTTPException(status_code=400, detail="No ingredients provided.")
+    
+    request = request.model_dump(exclude_none=True)
+
+    payload = {
+        "title": request["title"],
+        "instructions": request["instructions"],
+        "line_items": request["ingredients"]
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {instacart_api_key}",
+    }
+
+    response = requests.post(
+        f"{instacart_server}/idp/v1/products/products_link",
+        json=payload,
+        headers=headers,
+    )
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
