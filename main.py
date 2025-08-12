@@ -6,17 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 app = FastAPI()
-
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-]
 
 app.add_middleware(
     CORSMiddleware,
@@ -56,8 +50,21 @@ class InstacartIngredients(BaseModel):
     ingredients: List[LineItem]
 
 
+class InstacartInstructions(BaseModel):
+    instructions: List[str]
+
+
 class RawIngredients(BaseModel):
     ingredients: List[str]
+
+
+class RawInstructions(BaseModel):
+    instructions: str
+
+
+class InstacartShoppingList(BaseModel):
+    title: str
+    ingredients: List[LineItem]
 
 
 @app.post("/parse-recipe")
@@ -81,7 +88,6 @@ async def instacart_ingredients(request: RawIngredients):
 
     with open("llm_prompt.txt", "r") as f:
         system_prompt = f.read()
-
     user_prompt = f"Input:\n{request.ingredients}"
 
     response = client.responses.parse(
@@ -94,3 +100,32 @@ async def instacart_ingredients(request: RawIngredients):
     )
 
     return response.output_parsed
+
+
+@app.post("/instacart-instructions")
+async def instacart_instructions(request: RawInstructions):
+    if not request.instructions:
+        raise HTTPException(status_code=400, detail="No instructions provided.")
+
+    system_prompt = """
+    Format these instructions to an array of string values.
+    Modify them to be comprehendable and complete. 
+    Try to limit guessing.
+    """
+    user_prompt = f"Input:\n{request.instructions}"
+
+    response = client.responses.parse(
+        model="gpt-5-nano-2025-08-07",
+        input=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        text_format=InstacartInstructions,
+    )
+
+    return response.output_parsed
+
+
+@app.post("/instacart-shopping-list")
+async def instacart_shopping_list(request: InstacartIngredients):
+    pass
