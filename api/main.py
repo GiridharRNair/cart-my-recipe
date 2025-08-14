@@ -73,7 +73,10 @@ class InstacartShoppingList(BaseModel):
 
 @app.post("/parse-recipe")
 async def parse_recipe(request: RecipeRequest):
-    scraper = scrape_html(html=request.html, org_url=request.url)
+    try:
+        scraper = scrape_html(html=request.html, org_url=request.url)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing recipe: {str(e)}")
 
     if not scraper.ingredients():
         raise HTTPException(status_code=400, detail="No ingredients found.")
@@ -105,7 +108,7 @@ async def instacart_ingredients(request: RawIngredients):
             text_format=InstacartIngredients,
         )
 
-        return response.output_parsed
+        return response.output_parsed.ingredients
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -130,7 +133,7 @@ async def instacart_instructions(request: RawInstructions):
             ],
             text_format=InstacartInstructions,
         )
-        return response.output_parsed
+        return response.output_parsed.instructions
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
