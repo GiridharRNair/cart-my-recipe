@@ -1,0 +1,19 @@
+export type Recipe = {
+    title: string;
+    instructions: string[] | string;
+    ingredients: string[];
+    image_url?: string;
+};
+
+export type ListenerError = {
+    error: string;
+};
+
+export type InstacartProductLinkUrl = {
+    products_link_url: string;
+};
+
+export type ChromeListener = {
+    data: Recipe | string[] | string | InstacartProductLinkUrl;
+    error: boolean;
+};
