@@ -1,5 +1,10 @@
 import axios from "axios";
-import { Recipe, InstacartProductLinkUrl } from "@/types";
+import {
+    Recipe,
+    InstacartProductLinkUrl,
+    InstacartIngredients,
+    InstacartInstructions,
+} from "@/types";
 
 console.log("Background script running!");
 
@@ -80,7 +85,7 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
                     },
                 );
 
-                const data: string[] = res.data;
+                const data: InstacartIngredients = res.data;
 
                 sendResponse({ data: data, error: false });
             } catch (err) {
@@ -113,7 +118,7 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
                     },
                 );
 
-                const data: string[] = res.data;
+                const data: InstacartInstructions = res.data;
 
                 sendResponse({ data: data, error: false });
             } catch (err) {
@@ -176,6 +181,29 @@ chrome.runtime.onMessage.addListener((request) => {
         } else {
             console.error("No URL provided to open Instacart page.");
         }
+    }
+    return true;
+});
+
+chrome.runtime.onMessage.addListener((request) => {
+    if (request.action === "OPEN_SIDE_PANEL") {
+        (async () => {
+            const tab = await getCurrentTab();
+            if (!tab || !tab.windowId) {
+                console.error("No active tab found or tab ID is undefined.");
+                return;
+            }
+
+            const tabWindowId = tab.windowId;
+
+            try {
+                chrome.sidePanel.open({
+                    windowId: tabWindowId,
+                });
+            } catch (error) {
+                console.error("Error opening side panel:", error);
+            }
+        })();
     }
     return true;
 });

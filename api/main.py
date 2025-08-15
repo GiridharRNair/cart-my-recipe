@@ -108,7 +108,7 @@ async def instacart_ingredients(request: RawIngredients):
             text_format=InstacartIngredients,
         )
 
-        return response.output_parsed.ingredients
+        return response.output_parsed
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -133,7 +133,7 @@ async def instacart_instructions(request: RawInstructions):
             ],
             text_format=InstacartInstructions,
         )
-        return response.output_parsed.instructions
+        return response.output_parsed
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

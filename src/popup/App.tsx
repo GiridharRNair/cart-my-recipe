@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { Recipe, ChromeListener, InstacartProductLinkUrl } from "@/types";
+import {
+    Recipe,
+    ChromeListener,
+    InstacartProductLinkUrl,
+    InstacartIngredients,
+    InstacartInstructions,
+} from "@/types";
 import InstacartLogo from "@/assets/instacart-logo.png";
 
 async function sendChromeMessage<T>(message: any): Promise<T> {
@@ -46,9 +52,12 @@ export default function App() {
                 return handleError("Failed to process ingredients");
             }
 
+            const instacartIngredients: InstacartIngredients =
+                ingredientsRes.data as InstacartIngredients;
+
             recipe = {
                 ...recipe,
-                ingredients: ingredientsRes.data as string[],
+                ingredients: instacartIngredients.ingredients,
             };
 
             setStatus("processing instructions");
@@ -61,9 +70,12 @@ export default function App() {
                 return handleError("Failed to process instructions");
             }
 
+            const instacartInstructions: InstacartInstructions =
+                instructionsRes.data as InstacartInstructions;
+
             recipe = {
                 ...recipe,
-                instructions: instructionsRes.data as string,
+                instructions: instacartInstructions.instructions,
             };
 
             setStatus("generating shopping list");
@@ -107,7 +119,7 @@ export default function App() {
                 onClick={handleButtonClick}
                 disabled={loading}
                 variant={"outline"}
-                className="w-full cursor-pointer font-light"
+                className="w-full cursor-pointer font-light h-[46px] rounded-3xl"
             >
                 {loading ? (
                     <>
@@ -119,9 +131,9 @@ export default function App() {
                         <img
                             src={InstacartLogo}
                             alt="Instacart Logo"
-                            className="w-4"
+                            className="w-[22px]"
                         />
-                        order ingredients
+                        Get Recipe Ingredients
                     </>
                 )}
             </Button>
