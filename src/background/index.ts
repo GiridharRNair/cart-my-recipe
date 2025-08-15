@@ -29,20 +29,20 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
         const tabId = tab.id;
         const tabUrl = tab.url;
 
-        const [result] = await chrome.scripting.executeScript({
-            target: { tabId: tabId },
-            world: "MAIN",
-            func: () => document.documentElement.outerHTML,
-        });
-
-        const htmlContent = result.result;
-        if (typeof htmlContent !== "string") {
-            console.error("HTML content is not a string.");
-            sendResponse({ data: null, error: true });
-            return;
-        }
-
         try {
+            const [result] = await chrome.scripting.executeScript({
+                target: { tabId: tabId },
+                world: "MAIN",
+                func: () => document.documentElement.outerHTML,
+            });
+
+            const htmlContent = result.result;
+            if (typeof htmlContent !== "string") {
+                console.error("HTML content is not a string.");
+                sendResponse({ data: null, error: true });
+                return;
+            }
+
             const res = await axios.post(`${BACKEND_API_URL}/parse-recipe`, {
                 html: htmlContent,
                 url: tabUrl,
@@ -146,6 +146,7 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
             const data: InstacartProductLinkUrl = res.data;
 
             shoppingList.instacart_products_link_url = data.products_link_url;
+            shoppingList.date_created = new Date().toISOString();
 
             await chrome.storage.local.set({
                 [shoppingList.title]: shoppingList,
@@ -183,15 +184,29 @@ chrome.runtime.onMessage.addListener((request) => {
 chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
     if (request.action === "GET_PAST_RECIPES") {
         try {
-            const recipes = await chrome.storage.local.get();
-            const pastRecipes = Object.values(recipes).filter(
-                (item) => item && typeof item === "object",
-            );
+            const recipesObj = await chrome.storage.local.get();
+            const pastRecipes = Object.values(recipesObj)
+                .filter(
+                    (item): item is Recipe =>
+                        item &&
+                        typeof item === "object" &&
+                        "title" in item &&
+                        "ingredients" in item &&
+                        "instructions" in item,
+                )
+                .sort((a, b) => {
+                    const dateA = new Date(a.date_created ?? 0).getTime();
+                    const dateB = new Date(b.date_created ?? 0).getTime();
+                    return dateB - dateA;
+                });
+
             sendResponse({ data: pastRecipes, error: false });
         } catch (err) {
             console.error("Error retrieving past recipes:", err);
             sendResponse({ data: null, error: true });
         }
+
+        return true;
     }
-    return true;
+    return false;
 });

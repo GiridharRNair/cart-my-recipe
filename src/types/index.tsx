@@ -5,6 +5,7 @@ export type Recipe = {
     ingredients: string[];
     image_url?: string;
     instacart_products_link_url?: string;
+    date_created?: string;
 };
 
 export type ListenerError = {

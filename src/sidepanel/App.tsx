@@ -5,7 +5,13 @@ import { ISSUE_FORM_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { ExternalLink, Utensils, Clock } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardDescription,
+} from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import InstacartLogo from "@/assets/instacart-logo.png";
@@ -98,22 +104,31 @@ export default function App() {
 
     return (
         <ScrollArea className="flex-1">
-            <div className="p-3 space-y-3">
+            <div className="p-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-fr">
                 {pastRecipes.map((recipe, index) => (
                     <Card
                         key={index}
-                        className="hover:shadow-md transition-shadow"
+                        className="hover:shadow-md transition-shadow w-full mx-auto flex flex-col max-w-lg"
                     >
                         <CardHeader>
-                            <div className="flex items-start justify-between gap-2">
-                                <CardTitle className="text-base font-medium leading-tight">
-                                    {recipe.title}
-                                </CardTitle>
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 space-y-2">
+                                    <CardTitle className="text-base font-medium leading-tight">
+                                        {recipe.title}
+                                    </CardTitle>
+                                    <CardDescription className="text-xs text-muted-foreground">
+                                        {recipe.date_created
+                                            ? new Date(
+                                                  recipe.date_created,
+                                              ).toLocaleDateString()
+                                            : "Unknown date"}
+                                    </CardDescription>
+                                </div>
                                 {recipe.image_url && (
                                     <img
                                         src={recipe.image_url}
                                         alt={recipe.title}
-                                        className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+                                        className="w-15 h-15 rounded-md object-cover flex-shrink-0"
                                     />
                                 )}
                             </div>

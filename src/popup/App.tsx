@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, ExternalLink } from "lucide-react";
 import {
     Recipe,
     ChromeListener,
@@ -9,7 +9,7 @@ import {
     InstacartInstructions,
 } from "@/types";
 import InstacartLogo from "@/assets/instacart-logo.png";
-import { sendChromeMessage } from "@/lib/utils";
+import { sendChromeMessage, ISSUE_FORM_URL } from "@/lib/utils";
 
 export default function App() {
     const [status, setStatus] = useState("");
@@ -32,7 +32,7 @@ export default function App() {
             });
 
             if (parseRecipeRes.error) {
-                return handleError("Recipe not found or invalid");
+                return handleError("Recipe not found or supported");
             }
 
             let recipe = parseRecipeRes.data as Recipe;
@@ -151,6 +151,17 @@ export default function App() {
                 className="w-full cursor-pointer font-light h-[46px] rounded-3xl"
             >
                 get past recipes
+            </Button>
+
+            <Button
+                variant="link"
+                className="w-full h-5 cursor-pointer font-light text-xs text-center"
+                onClick={() =>
+                    window.open(ISSUE_FORM_URL, "_blank", "noopener,noreferrer")
+                }
+            >
+                <ExternalLink />
+                Report Issue?
             </Button>
         </div>
     );
