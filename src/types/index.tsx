@@ -3,6 +3,7 @@ export type Recipe = {
     instructions: string[] | string;
     ingredients: string[];
     image_url?: string;
+    instacart_products_link_url?: string;
 };
 
 export type ListenerError = {

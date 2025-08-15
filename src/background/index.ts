@@ -145,6 +145,12 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
 
             const data: InstacartProductLinkUrl = res.data;
 
+            shoppingList.instacart_products_link_url = data.products_link_url;
+
+            await chrome.storage.local.set({
+                [shoppingList.title]: shoppingList,
+            });
+
             sendResponse({ data: data, error: false });
         } catch (err) {
             if (axios.isAxiosError(err)) {
@@ -169,6 +175,22 @@ chrome.runtime.onMessage.addListener((request) => {
             console.log("Opening Instacart page:", url);
         } else {
             console.error("No URL provided to open Instacart page.");
+        }
+    }
+    return true;
+});
+
+chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
+    if (request.action === "GET_PAST_RECIPES") {
+        try {
+            const recipes = await chrome.storage.local.get();
+            const pastRecipes = Object.values(recipes).filter(
+                (item) => item && typeof item === "object",
+            );
+            sendResponse({ data: pastRecipes, error: false });
+        } catch (err) {
+            console.error("Error retrieving past recipes:", err);
+            sendResponse({ data: null, error: true });
         }
     }
     return true;
