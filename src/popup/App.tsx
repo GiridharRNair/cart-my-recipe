@@ -9,12 +9,7 @@ import {
     InstacartInstructions,
 } from "@/types";
 import InstacartLogo from "@/assets/instacart-logo.png";
-
-async function sendChromeMessage<T>(message: any): Promise<T> {
-    return new Promise<T>((resolve) => {
-        chrome.runtime.sendMessage(message, resolve);
-    });
-}
+import { sendChromeMessage } from "@/lib/utils";
 
 export default function App() {
     const [status, setStatus] = useState("");

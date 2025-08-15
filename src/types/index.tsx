@@ -1,5 +1,6 @@
 export type Recipe = {
     title: string;
+    canonical_url: string;
     instructions: string[] | string;
     ingredients: string[];
     image_url?: string;

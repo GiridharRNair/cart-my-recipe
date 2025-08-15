@@ -80,9 +80,10 @@ async def parse_recipe(request: RecipeRequest):
 
     if not scraper.ingredients():
         raise HTTPException(status_code=400, detail="No ingredients found.")
-
+    
     return {
         "title": scraper.title(),
+        "canonical_url": scraper.canonical_url(),
         "ingredients": scraper.ingredients(),
         "instructions": scraper.instructions(),
         "image_url": scraper.image(),
