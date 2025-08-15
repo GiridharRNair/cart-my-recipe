@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, ShoppingCart, ExternalLink } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Recipe, ChromeListener, InstacartProductLinkUrl } from "@/types";
+import InstacartLogo from "@/assets/instacart-logo.png";
 
 async function sendChromeMessage<T>(message: any): Promise<T> {
     return new Promise<T>((resolve) => {
@@ -9,18 +10,9 @@ async function sendChromeMessage<T>(message: any): Promise<T> {
     });
 }
 
-const STATUS_MESSAGES = {
-    PARSING_RECIPE: "parsing recipe",
-    PROCESSING_INGREDIENTS: "processing ingredients",
-    PROCESSING_INSTRUCTIONS: "processing instructions",
-    CREATING_SHOPPING_LIST: "creating shopping list",
-};
-
 export default function App() {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
-    const [shoppingListUrl, setShoppingListUrl] =
-        useState<InstacartProductLinkUrl | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     async function handleError(message: string) {
@@ -31,21 +23,20 @@ export default function App() {
     async function getInstacartShoppingList() {
         setLoading(true);
         setError(null);
-        setShoppingListUrl(null);
 
         try {
-            setStatus(STATUS_MESSAGES.PARSING_RECIPE);
+            setStatus("processing recipe");
             const parseRecipeRes = await sendChromeMessage<ChromeListener>({
                 action: "PARSE_RECIPE",
             });
 
             if (parseRecipeRes.error) {
-                return handleError("Recipe not supported on this page");
+                return handleError("Recipe not found or invalid");
             }
 
             let recipe = parseRecipeRes.data as Recipe;
 
-            setStatus(STATUS_MESSAGES.PROCESSING_INGREDIENTS);
+            setStatus("processing ingredients");
             const ingredientsRes = await sendChromeMessage<ChromeListener>({
                 action: "INSTACART_INGREDIENTS",
                 ingredients: recipe.ingredients,
@@ -60,7 +51,7 @@ export default function App() {
                 ingredients: ingredientsRes.data as string[],
             };
 
-            setStatus(STATUS_MESSAGES.PROCESSING_INSTRUCTIONS);
+            setStatus("processing instructions");
             const instructionsRes = await sendChromeMessage<ChromeListener>({
                 action: "INSTACART_INSTRUCTIONS",
                 instructions: recipe.instructions,
@@ -75,7 +66,7 @@ export default function App() {
                 instructions: instructionsRes.data as string,
             };
 
-            setStatus(STATUS_MESSAGES.CREATING_SHOPPING_LIST);
+            setStatus("generating shopping list");
             const shoppingListRes = await sendChromeMessage<ChromeListener>({
                 action: "INSTACART_SHOPPING_LIST",
                 shoppingList: recipe,
@@ -85,7 +76,14 @@ export default function App() {
                 return handleError("Failed to create shopping list");
             }
 
-            setShoppingListUrl(shoppingListRes.data as InstacartProductLinkUrl);
+            setStatus("redirecting to Instacart");
+            const shoppingList: InstacartProductLinkUrl =
+                shoppingListRes.data as InstacartProductLinkUrl;
+
+            await sendChromeMessage({
+                action: "OPEN_INSTACART_PAGE",
+                url: shoppingList.products_link_url,
+            });
         } catch (err) {
             handleError("An unexpected error occurred");
         } finally {
@@ -94,20 +92,12 @@ export default function App() {
     }
 
     const handleButtonClick = () => {
-        if (shoppingListUrl) {
-            window.open(
-                shoppingListUrl.products_link_url,
-                "_blank",
-                "noopener,noreferrer",
-            );
-        } else {
-            getInstacartShoppingList();
-        }
+        getInstacartShoppingList();
     };
 
     return (
-        <div className="w-72 p-4 space-y-4">
-            <h1 className="text-xl text-center">cart your recipe</h1>
+        <div className="w-72 p-4 space-y-3">
+            <h1 className="text-xl text-center font-light">cart my recipe</h1>
 
             {error && (
                 <div className="text-sm text-red-600 text-center">{error}</div>
@@ -117,21 +107,20 @@ export default function App() {
                 onClick={handleButtonClick}
                 disabled={loading}
                 variant={"outline"}
-                className="w-full"
+                className="w-full cursor-pointer font-light"
             >
                 {loading ? (
                     <>
                         <Loader2 className="h-4 w-4 animate-spin" />
                         {status}
                     </>
-                ) : shoppingListUrl ? (
-                    <>
-                        <ExternalLink className="h-4 w-4" />
-                        open in Instacart
-                    </>
                 ) : (
                     <>
-                        <ShoppingCart className="h-4 w-4" />
+                        <img
+                            src={InstacartLogo}
+                            alt="Instacart Logo"
+                            className="w-4"
+                        />
                         order ingredients
                     </>
                 )}

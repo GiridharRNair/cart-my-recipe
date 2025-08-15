@@ -21,4 +21,5 @@ export default defineManifest({
     background: {
         service_worker: "src/background/index.ts",
     },
+    host_permissions: ["https://*/*", "http://*/*"],
 });

@@ -166,3 +166,16 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
     }
     return true;
 });
+
+chrome.runtime.onMessage.addListener((request) => {
+    if (request.action === "OPEN_INSTACART_PAGE") {
+        const url = request.url;
+        if (url) {
+            chrome.tabs.create({ url: url });
+            console.log("Opening Instacart page:", url);
+        } else {
+            console.error("No URL provided to open Instacart page.");
+        }
+    }
+    return true;
+});
