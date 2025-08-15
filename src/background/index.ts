@@ -17,56 +17,51 @@ async function getCurrentTab() {
     return tab;
 }
 
-chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
     if (request.action === "PARSE_RECIPE") {
-        (async () => {
-            const tab = await getCurrentTab();
-            if (!tab || !tab.id) {
-                console.error("No active tab found or tab ID is undefined.");
-                sendResponse({ data: null, error: true });
-                return;
-            }
+        const tab = await getCurrentTab();
+        if (!tab || !tab.id) {
+            console.error("No active tab found or tab ID is undefined.");
+            sendResponse({ data: null, error: true });
+            return;
+        }
 
-            const tabId = tab.id;
-            const tabUrl = tab.url;
+        const tabId = tab.id;
+        const tabUrl = tab.url;
 
-            const [result] = await chrome.scripting.executeScript({
-                target: { tabId: tabId },
-                world: "MAIN",
-                func: () => document.documentElement.outerHTML,
+        const [result] = await chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            world: "MAIN",
+            func: () => document.documentElement.outerHTML,
+        });
+
+        const htmlContent = result.result;
+        if (typeof htmlContent !== "string") {
+            console.error("HTML content is not a string.");
+            sendResponse({ data: null, error: true });
+            return;
+        }
+
+        try {
+            const res = await axios.post(`${BACKEND_API_URL}/parse-recipe`, {
+                html: htmlContent,
+                url: tabUrl,
             });
 
-            const htmlContent = result.result;
-            if (typeof htmlContent !== "string") {
-                console.error("HTML content is not a string.");
-                sendResponse({ data: null, error: true });
-                return;
-            }
+            const data: Recipe = res.data;
 
-            try {
-                const res = await axios.post(
-                    `${BACKEND_API_URL}/parse-recipe`,
-                    {
-                        html: htmlContent,
-                        url: tabUrl,
-                    },
+            sendResponse({ data: data, error: false });
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                console.error(
+                    "Axios error:",
+                    err.response?.data || err.message,
                 );
-
-                const data: Recipe = res.data;
-
-                sendResponse({ data: data, error: false });
-            } catch (err) {
-                if (axios.isAxiosError(err)) {
-                    console.error(
-                        "Axios error:",
-                        err.response?.data || err.message,
-                    );
-                } else {
-                    console.error("Unexpected error:", err);
-                }
-                sendResponse({ data: null, error: true });
+            } else {
+                console.error("Unexpected error:", err);
             }
-        })();
+            sendResponse({ data: null, error: true });
+        }
     }
 
     return true;
@@ -74,32 +69,30 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
 
 chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
     if (request.action === "INSTACART_INGREDIENTS") {
-        (async () => {
-            const ingredients: string[] = request.ingredients;
+        const ingredients: string[] = request.ingredients;
 
-            try {
-                const res = await axios.post(
-                    `${BACKEND_API_URL}/instacart-ingredients`,
-                    {
-                        ingredients: ingredients,
-                    },
+        try {
+            const res = await axios.post(
+                `${BACKEND_API_URL}/instacart-ingredients`,
+                {
+                    ingredients: ingredients,
+                },
+            );
+
+            const data: InstacartIngredients = res.data;
+
+            sendResponse({ data: data, error: false });
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                console.error(
+                    "Axios error:",
+                    err.response?.data || err.message,
                 );
-
-                const data: InstacartIngredients = res.data;
-
-                sendResponse({ data: data, error: false });
-            } catch (err) {
-                if (axios.isAxiosError(err)) {
-                    console.error(
-                        "Axios error:",
-                        err.response?.data || err.message,
-                    );
-                } else {
-                    console.error("Unexpected error:", err);
-                }
-                sendResponse({ data: null, error: true });
+            } else {
+                console.error("Unexpected error:", err);
             }
-        })();
+            sendResponse({ data: null, error: true });
+        }
     }
 
     return true;
@@ -107,32 +100,30 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
 
 chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
     if (request.action === "INSTACART_INSTRUCTIONS") {
-        (async () => {
-            const instructions: string = request.instructions;
+        const instructions: string = request.instructions;
 
-            try {
-                const res = await axios.post(
-                    `${BACKEND_API_URL}/instacart-instructions`,
-                    {
-                        instructions: instructions,
-                    },
+        try {
+            const res = await axios.post(
+                `${BACKEND_API_URL}/instacart-instructions`,
+                {
+                    instructions: instructions,
+                },
+            );
+
+            const data: InstacartInstructions = res.data;
+
+            sendResponse({ data: data, error: false });
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                console.error(
+                    "Axios error:",
+                    err.response?.data || err.message,
                 );
-
-                const data: InstacartInstructions = res.data;
-
-                sendResponse({ data: data, error: false });
-            } catch (err) {
-                if (axios.isAxiosError(err)) {
-                    console.error(
-                        "Axios error:",
-                        err.response?.data || err.message,
-                    );
-                } else {
-                    console.error("Unexpected error:", err);
-                }
-                sendResponse({ data: null, error: true });
+            } else {
+                console.error("Unexpected error:", err);
             }
-        })();
+            sendResponse({ data: null, error: true });
+        }
     }
 
     return true;
@@ -140,34 +131,32 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
 
 chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
     if (request.action === "INSTACART_SHOPPING_LIST") {
-        (async () => {
-            const shoppingList: Recipe = request.shoppingList;
-            try {
-                const res = await axios.post(
-                    `${BACKEND_API_URL}/instacart-shopping-list`,
-                    {
-                        title: shoppingList.title,
-                        instructions: shoppingList.instructions,
-                        ingredients: shoppingList.ingredients,
-                        image_url: shoppingList.image_url || "",
-                    },
+        const shoppingList: Recipe = request.shoppingList;
+        try {
+            const res = await axios.post(
+                `${BACKEND_API_URL}/instacart-shopping-list`,
+                {
+                    title: shoppingList.title,
+                    instructions: shoppingList.instructions,
+                    ingredients: shoppingList.ingredients,
+                    image_url: shoppingList.image_url || "",
+                },
+            );
+
+            const data: InstacartProductLinkUrl = res.data;
+
+            sendResponse({ data: data, error: false });
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                console.error(
+                    "Axios error:",
+                    err.response?.data || err.message,
                 );
-
-                const data: InstacartProductLinkUrl = res.data;
-
-                sendResponse({ data: data, error: false });
-            } catch (err) {
-                if (axios.isAxiosError(err)) {
-                    console.error(
-                        "Axios error:",
-                        err.response?.data || err.message,
-                    );
-                } else {
-                    console.error("Unexpected error:", err);
-                }
-                sendResponse({ data: null, error: true });
+            } else {
+                console.error("Unexpected error:", err);
             }
-        })();
+            sendResponse({ data: null, error: true });
+        }
     }
     return true;
 });
@@ -181,29 +170,6 @@ chrome.runtime.onMessage.addListener((request) => {
         } else {
             console.error("No URL provided to open Instacart page.");
         }
-    }
-    return true;
-});
-
-chrome.runtime.onMessage.addListener((request) => {
-    if (request.action === "OPEN_SIDE_PANEL") {
-        (async () => {
-            const tab = await getCurrentTab();
-            if (!tab || !tab.windowId) {
-                console.error("No active tab found or tab ID is undefined.");
-                return;
-            }
-
-            const tabWindowId = tab.windowId;
-
-            try {
-                chrome.sidePanel.open({
-                    windowId: tabWindowId,
-                });
-            } catch (error) {
-                console.error("Error opening side panel:", error);
-            }
-        })();
     }
     return true;
 });

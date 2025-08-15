@@ -103,9 +103,21 @@ export default function App() {
         }
     }
 
-    const handleButtonClick = () => {
-        getInstacartShoppingList();
-    };
+    async function openSidePanel() {
+        try {
+            const [tab] = await chrome.tabs.query({
+                active: true,
+                currentWindow: true,
+            });
+            if (tab?.windowId !== undefined) {
+                await chrome.sidePanel.open({ windowId: tab.windowId });
+            } else {
+                console.error("No active tab or window found.");
+            }
+        } catch (error) {
+            console.error("Error opening side panel:", error);
+        }
+    }
 
     return (
         <div className="w-72 p-4 space-y-3">
@@ -116,7 +128,7 @@ export default function App() {
             )}
 
             <Button
-                onClick={handleButtonClick}
+                onClick={getInstacartShoppingList}
                 disabled={loading}
                 variant={"outline"}
                 className="w-full cursor-pointer font-light h-[46px] rounded-3xl"
@@ -136,6 +148,14 @@ export default function App() {
                         Get Recipe Ingredients
                     </>
                 )}
+            </Button>
+
+            <Button
+                onClick={openSidePanel}
+                variant={"outline"}
+                className="w-full cursor-pointer font-light h-[46px] rounded-3xl"
+            >
+                get past recipes
             </Button>
         </div>
     );
