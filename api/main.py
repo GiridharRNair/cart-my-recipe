@@ -94,12 +94,12 @@ async def parse_recipe(request: RecipeRequest):
 async def instacart_ingredients(request: RawIngredients):
     if not request.ingredients:
         raise HTTPException(status_code=400, detail="No ingredients provided.")
-
-    with open("instacart_ingredients_llm_prompt.txt", "r") as f:
-        system_prompt = f.read()
-    user_prompt = f"Input:\n{request.ingredients}"
-
+    
     try:
+        with open("instacart_ingredients_llm_prompt.txt", "r") as f:
+            system_prompt = f.read()
+        user_prompt = f"Input:\n{request.ingredients}"
+
         response = client.responses.parse(
             model="gpt-4o-mini-2024-07-18",
             input=[
