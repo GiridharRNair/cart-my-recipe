@@ -93,11 +93,10 @@ export default function App() {
 
     if (pastRecipes.length === 0) {
         return (
-            <div className="h-screen w-screen flex flex-col items-center justify-center text-center space-y-4">
-                <Utensils className="h-12 w-12 mx-auto" />
-                <h3 className="text-lg font-light text-muted-foreground">
+            <div className="h-screen w-screen flex items-center justify-center">
+                <span className="text-muted-foreground text-base font-light">
                     No recipes yet
-                </h3>
+                </span>
             </div>
         );
     }

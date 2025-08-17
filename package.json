@@ -1,11 +1,12 @@
 {
-    "name": "cart-my-recipe",
+    "name": "Cart My Recipe",
     "type": "module",
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "api": "cd api && fastapi dev main.py",
-        "format": "prettier --write . --tab-width 4",
+        "postinstall": "pip install -r api/requirements-dev.txt",
+        "api": "fastapi dev api/main.py",
+        "format": "prettier --write . --tab-width 4 && ruff format api",
         "dev": "vite",
         "build": "tsc -b && vite build",
         "preview": "vite preview"
