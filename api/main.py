@@ -5,6 +5,7 @@ from recipe_scrapers import scrape_html
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 import os
+from os.path import join
 from dotenv import load_dotenv
 import requests
 
@@ -80,7 +81,7 @@ async def parse_recipe(request: RecipeRequest):
 
     if not scraper.ingredients():
         raise HTTPException(status_code=400, detail="No ingredients found.")
-    
+
     return {
         "title": scraper.title(),
         "canonical_url": scraper.canonical_url(),
@@ -94,9 +95,9 @@ async def parse_recipe(request: RecipeRequest):
 async def instacart_ingredients(request: RawIngredients):
     if not request.ingredients:
         raise HTTPException(status_code=400, detail="No ingredients provided.")
-    
+
     try:
-        with open("instacart_ingredients_llm_prompt.txt", "r") as f:
+        with open(join("data", "instacart_ingredients_llm_prompt.txt"), "r") as f:
             system_prompt = f.read()
         user_prompt = f"Input:\n{request.ingredients}"
 
