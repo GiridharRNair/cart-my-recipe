@@ -10,6 +10,12 @@ import {
 import InstacartLogo from "@/assets/instacart-logo.png";
 import { sendChromeMessage, ISSUE_FORM_URL } from "@/lib/utils";
 
+const PARSE_METHODS = [
+    "PARSE_RECIPE_BACKEND",
+    "PARSE_RECIPE_JSONLD",
+    "PARSE_RECIPE_HTML",
+];
+
 export default function App() {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
@@ -26,15 +32,22 @@ export default function App() {
 
         try {
             setStatus("processing recipe");
-            const parseRecipeRes = await sendChromeMessage<ChromeListener>({
-                action: "PARSE_RECIPE",
-            });
+            let recipe: Recipe | null = null;
 
-            if (parseRecipeRes.error) {
-                return handleError("Recipe not found or supported");
+            for (const method of PARSE_METHODS) {
+                const parseRecipeRes = await sendChromeMessage<ChromeListener>({
+                    action: method,
+                });
+
+                if (!parseRecipeRes.error) {
+                    recipe = parseRecipeRes.data as Recipe;
+                    break;
+                }
             }
 
-            let recipe = parseRecipeRes.data as Recipe;
+            if (!recipe) {
+                return handleError("Recipe not found or supported");
+            }
 
             setStatus("processing ingredients");
             const ingredientsRes = await sendChromeMessage<ChromeListener>({
