@@ -53,21 +53,12 @@ class InstacartIngredients(BaseModel):
     ingredients: List[LineItem]
 
 
-class InstacartInstructions(BaseModel):
-    instructions: List[str]
-
-
 class RawIngredients(BaseModel):
     ingredients: List[str]
 
 
-class RawInstructions(BaseModel):
-    instructions: str
-
-
 class InstacartShoppingList(BaseModel):
     title: str
-    instructions: List[str]
     ingredients: List[LineItem]
     image_url: Optional[str] = None
 
@@ -86,7 +77,6 @@ async def parse_recipe(request: RecipeRequest):
         "title": scraper.title(),
         "canonical_url": scraper.canonical_url(),
         "ingredients": scraper.ingredients(),
-        "instructions": scraper.instructions(),
         "image_url": scraper.image(),
     }
 
@@ -115,38 +105,10 @@ async def instacart_ingredients(request: RawIngredients):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/instacart-instructions")
-async def instacart_instructions(request: RawInstructions):
-    if not request.instructions:
-        raise HTTPException(status_code=400, detail="No instructions provided.")
-
-    system_prompt = """
-    Format these instructions to an array of string values.
-    Modify them to be comprehendable and complete. 
-    Try to limit guessing.
-    """
-    user_prompt = f"Input:\n{request.instructions}"
-    try:
-        response = client.responses.parse(
-            model="gpt-4o-mini-2024-07-18",
-            input=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            text_format=InstacartInstructions,
-        )
-        return response.output_parsed
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.post("/instacart-shopping-list")
 async def instacart_shopping_list(request: InstacartShoppingList):
     if not request.title:
         raise HTTPException(status_code=400, detail="No title provided.")
-
-    if not request.instructions:
-        raise HTTPException(status_code=400, detail="No instructions provided.")
 
     if not request.ingredients:
         raise HTTPException(status_code=400, detail="No ingredients provided.")
@@ -155,7 +117,6 @@ async def instacart_shopping_list(request: InstacartShoppingList):
 
     payload = {
         "title": request["title"],
-        "instructions": request["instructions"],
         "line_items": request["ingredients"],
         "image_url": request["image_url"],
     }
