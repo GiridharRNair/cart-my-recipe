@@ -6,7 +6,6 @@ import {
     ChromeListener,
     InstacartProductLinkUrl,
     InstacartIngredients,
-    InstacartInstructions,
 } from "@/types";
 import InstacartLogo from "@/assets/instacart-logo.png";
 import { sendChromeMessage, ISSUE_FORM_URL } from "@/lib/utils";
@@ -53,24 +52,6 @@ export default function App() {
             recipe = {
                 ...recipe,
                 ingredients: instacartIngredients.ingredients,
-            };
-
-            setStatus("processing instructions");
-            const instructionsRes = await sendChromeMessage<ChromeListener>({
-                action: "INSTACART_INSTRUCTIONS",
-                instructions: recipe.instructions,
-            });
-
-            if (instructionsRes.error) {
-                return handleError("Failed to process instructions");
-            }
-
-            const instacartInstructions: InstacartInstructions =
-                instructionsRes.data as InstacartInstructions;
-
-            recipe = {
-                ...recipe,
-                instructions: instacartInstructions.instructions,
             };
 
             setStatus("generating shopping list");

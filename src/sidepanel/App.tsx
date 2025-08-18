@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { Recipe } from "@/types";
-import { sendChromeMessage } from "@/lib/utils";
-import { ISSUE_FORM_URL } from "@/lib/utils";
+import { Recipe, ChromeListener } from "@/types";
+import { sendChromeMessage, ISSUE_FORM_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { ExternalLink, Utensils, Clock } from "lucide-react";
+import { ExternalLink, Utensils } from "lucide-react";
 import {
     Card,
     CardHeader,
@@ -29,10 +28,7 @@ export default function App() {
         setLoading(true);
         setError(null);
         try {
-            const response = await sendChromeMessage<{
-                data: Recipe[];
-                error: boolean;
-            }>({
+            const response = await sendChromeMessage<ChromeListener>({
                 action: "GET_PAST_RECIPES",
             });
 
@@ -40,7 +36,9 @@ export default function App() {
                 throw new Error("Failed to fetch past recipes");
             }
 
-            setPastRecipes(response.data);
+            const recipes = response.data as Recipe[];
+
+            setPastRecipes(recipes);
         } catch (err) {
             setError(
                 "Something went wrong while fetching past recipes. If the issue persists, please report it using the link below.",
@@ -52,7 +50,7 @@ export default function App() {
 
     async function openInstacartLink(instacartUrl: string) {
         try {
-            await sendChromeMessage({
+            await sendChromeMessage<ChromeListener>({
                 action: "OPEN_INSTACART_PAGE",
                 url: instacartUrl,
             });
@@ -127,26 +125,17 @@ export default function App() {
                                     <img
                                         src={recipe.image_url}
                                         alt={recipe.title}
-                                        className="w-15 h-15 rounded-md object-cover flex-shrink-0"
+                                        className="w-18 h-18 rounded-md object-cover flex-shrink-0"
                                     />
                                 )}
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                            <div className="space-y-2 text-xs text-muted-foreground">
-                                <div className="flex items-center gap-2">
-                                    <Utensils className="h-3 w-3" />
-                                    <span>
-                                        {recipe.ingredients.length} ingredients
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Clock className="h-3 w-3" />
-                                    <span>
-                                        {recipe.instructions.length}{" "}
-                                        instructions
-                                    </span>
-                                </div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <Utensils className="h-3 w-3" />
+                                <span>
+                                    {recipe.ingredients.length} ingredients
+                                </span>
                             </div>
 
                             <Separator />
