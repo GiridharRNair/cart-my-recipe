@@ -3,7 +3,7 @@ import pkg from "./package.json";
 
 export default defineManifest({
     manifest_version: 3,
-    name: pkg.name,
+    name: "Cart My Recipe",
     version: pkg.version,
     description: "Turn any recipe into a grocery delivery!",
     icons: {

@@ -202,7 +202,10 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
                         const elements = document.querySelectorAll(selector);
                         if (elements.length > 0) {
                             ingredients = Array.from(elements)
-                                .map((el) => el.textContent.trim())
+                                .map((el) => {
+                                    const text = el?.textContent;
+                                    return text ? text.trim() : "";
+                                })
                                 .filter((text) => text.length > 0);
                             break;
                         }
@@ -212,7 +215,10 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
                     if (ingredients.length === 0) {
                         const lists = document.querySelectorAll("ul li, ol li");
                         const potentialIngredients = Array.from(lists)
-                            .map((li) => li.textContent.trim())
+                            .map((li) => {
+                                const text = li?.textContent;
+                                return text ? text.trim() : "";
+                            })
                             .filter((text) => {
                                 // Simple check for ingredient-like text
                                 return (
