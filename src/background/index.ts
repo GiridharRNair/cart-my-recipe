@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
 
             const data: Recipe = res.data;
 
-            console.log("Recipe:", data);
+            console.log("Recipe Python package method:", data);
 
             sendResponse({ data: data, error: false });
         } catch (err) {
@@ -138,7 +138,7 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
                 image_url: recipeObj.image[0] || "",
             };
 
-            console.log("Recipe:", recipe);
+            console.log("Recipe JSON-LD method:", recipe);
 
             sendResponse({ data: recipe, error: false });
         } catch (err) {
@@ -267,7 +267,7 @@ chrome.runtime.onMessage.addListener(async (request, _, sendResponse) => {
                 image_url: scraped.image || "",
             };
 
-            console.log("Recipe:", recipe);
+            console.log("Recipe HTML method:", recipe);
 
             sendResponse({ data: recipe, error: false });
         } catch (err) {
