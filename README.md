@@ -63,3 +63,9 @@ npm run build
 - The CRXJS plugin automatically handles manifest generation
 - Content scripts should be placed in `src/content/`
 - Popup UI should be placed in `src/popup/`
+
+## Acknowledgements
+
+- [Python Recipe Scraper Package](https://github.com/hhursev/recipe-scrapers)
+- [Ben Awad’s Recipe Scraping Article](https://www.benawad.com/scraping-recipe-websites/)
+- [CRXJS](https://crxjs.dev/)
