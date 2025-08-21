@@ -13,6 +13,8 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 instacart_server = os.getenv("INSTACART_SERVER")
 instacart_api_key = os.getenv("INSTACART_API_KEY")
+instacart_partner_url = os.getenv("INSTACART_PARTNER_URL")
+
 app = FastAPI()
 
 app.add_middleware(
@@ -133,6 +135,9 @@ async def instacart_shopping_list(request: InstacartShoppingList):
             headers=headers,
         )
         response.raise_for_status()
-        return response.json()
+        response = response.json()
+        if response["products_link_url"] and instacart_partner_url:
+            response["products_link_url"] += instacart_partner_url
+        return response
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=str(e))
