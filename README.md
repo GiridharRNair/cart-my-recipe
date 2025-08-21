@@ -3,6 +3,8 @@ Chrome extension that lets you order ingredients from online recipes directly th
 
 🎥 [Demo Video](https://www.youtube.com/watch?v=CmE-I-yH8jo)
 
+https://chromewebstore.google.com/detail/cart-my-recipe/fbnbcmkopjplpopnjmohjfnphlaaldph?authuser=0&hl=en
+
 ## Quick Start
 
 ### Prerequisites
