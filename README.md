@@ -1,32 +1,45 @@
-# React + Vite + CRXJS
 
-This template helps you quickly start developing Chrome extensions with React, TypeScript and Vite. It includes the CRXJS Vite plugin for seamless Chrome extension development.
+Chrome extension that lets you order ingredients from online recipes directly through Instacart.
 
-## Features
-
-- React with TypeScript
-- TypeScript support
-- Vite build tool
-- CRXJS Vite plugin integration
-- Chrome extension manifest configuration
+🎥 [Demo Video](https://www.youtube.com/watch?v=CmE-I-yH8jo)
 
 ## Quick Start
 
-1. Install dependencies:
+### Prerequisites
+
+* Node.js
+* Python
+
+### Setup
 
 ```bash
-npm install
+# Clone the repo
+git clone GiridharRNair/cart-my-recipe
+cd cart-my-recipe
+
+# Python setup
+python -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+npm install   # installs for API + extension
 ```
 
-2. Start development server:
+### Development
 
 ```bash
+# Start extension dev server
 npm run dev
+
+# Start API server
+npm run api
 ```
 
-3. Open Chrome and navigate to `chrome://extensions/`, enable "Developer mode", and load the unpacked extension from the `dist` directory.
+* Open Chrome → `chrome://extensions/`
+* Enable **Developer Mode**
+* Load unpacked extension from the `dist` folder
 
-4. Build for production:
+### Build for Production
 
 ```bash
 npm run build
