@@ -8,7 +8,7 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "install-python-dependencies": "pip install -r api/requirements-dev.txt",
+        "install-api-dependencies": "pip install -r api/requirements-dev.txt",
         "format-api": "ruff format api",
         "lint-api": "ruff check api",
         "api": "fastapi dev api/main.py",
