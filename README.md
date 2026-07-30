@@ -24,7 +24,7 @@ source venv/bin/activate
 npm install
 
 # Install the backend (Python) dependencies
-npm run install-python-dependencies
+npm run install-api-dependencies
 ```
 
 Copy `.env.example` to `.env` and fill in your `OPENAI_API_KEY` and Instacart credentials.
