@@ -19,12 +19,15 @@ https://chromewebstore.google.com/detail/cart-my-recipe/fbnbcmkopjplpopnjmohjfnp
 git clone GiridharRNair/cart-my-recipe
 cd cart-my-recipe
 
-# Python setup
+# Python virtual environment
 python -m venv venv
 source venv/bin/activate
 
-# Install dependencies
-npm install   # installs for API + extension
+# Install the extension (Node) dependencies
+npm install
+
+# Install the backend (Python) dependencies
+npm run install-python-dependencies
 ```
 
 Copy `.env.example` to `.env` and fill in your `OPENAI_API_KEY` and Instacart credentials.
@@ -51,6 +54,14 @@ npm run build
 
 # Zip it for the Chrome Web Store (build/chrome-mv3-prod.zip)
 npm run package
+```
+
+### Formatting & Linting
+
+```bash
+npm run format       # Prettier over the extension source
+npm run format-api   # Ruff formatter over the backend
+npm run lint-api     # Ruff lint over the backend
 ```
 
 ### Publishing to the Chrome Web Store

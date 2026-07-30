@@ -8,8 +8,10 @@
     "private": true,
     "scripts": {
         "install-python-dependencies": "pip install -r api/requirements-dev.txt",
+        "format-api": "ruff format api",
+        "lint-api": "ruff check api",
         "api": "fastapi dev api/main.py",
-        "format": "prettier --write . --tab-width 4 && ruff format api",
+        "format": "prettier --write . --tab-width 4",
         "build:css": "tailwindcss -i src/tailwind.css -o src/style.gen.css --minify",
         "dev:css": "tailwindcss -i src/tailwind.css -o src/style.gen.css --watch",
         "dev": "npm run build:css && concurrently -k -n css,plasmo \"npm:dev:css\" \"plasmo dev\"",
