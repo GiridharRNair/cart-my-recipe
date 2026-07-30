@@ -1,7 +1,5 @@
 import logging
 import os
-from functools import lru_cache
-from pathlib import Path
 from typing import Annotated, List, Optional, cast
 
 import requests
@@ -9,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
+from prompt import SYSTEM_PROMPT
 from pydantic import BaseModel, Field
 from recipe_scrapers import scrape_html
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -29,20 +28,6 @@ instacart_partner_url = os.getenv("INSTACART_PARTNER_URL")
 allowed_origins = [
     o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()
 ]
-
-# Prompt lives next to the repo root regardless of the process working directory
-# (important on Vercel, where the CWD is not guaranteed).
-PROMPT_PATH = (
-    Path(__file__).resolve().parent.parent
-    / "data"
-    / "instacart_ingredients_llm_prompt.txt"
-)
-
-
-@lru_cache(maxsize=1)
-def get_system_prompt() -> str:
-    return PROMPT_PATH.read_text(encoding="utf-8")
-
 
 # Outbound HTTP timeout (seconds) so a slow Instacart call can't hang the worker.
 INSTACART_TIMEOUT = float(os.getenv("INSTACART_TIMEOUT", "15"))
@@ -213,7 +198,7 @@ async def instacart_ingredients(request: Request, payload: RawIngredients):
             model=openai_model,
             temperature=0,
             input=[
-                {"role": "system", "content": get_system_prompt()},
+                {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"Input:\n{payload.ingredients}"},
             ],
             text_format=InstacartIngredients,

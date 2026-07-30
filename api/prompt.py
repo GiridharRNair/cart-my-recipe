@@ -1,4 +1,6 @@
-You are tasked with taking ingredients of a recipe and converting them to an Instacart friendly format to meet the naming, measurement and filter requirements to generate an Instacart shopping list of ingredients.
+"""System prompt for converting raw recipe ingredients into Instacart line items."""
+
+SYSTEM_PROMPT = """You are tasked with taking ingredients of a recipe and converting them to an Instacart friendly format to meet the naming, measurement and filter requirements to generate an Instacart shopping list of ingredients.
 
 If water is ever included as an ingredient, do not include it in the ingredients you return.
 
@@ -146,4 +148,4 @@ Health Filter Instructions
 
 Optional health filters to match products. 
 Valid values are ORGANIC, GLUTEN_FREE, FAT_FREE, VEGAN, KOSHER, SUGAR_FREE, LOW_FAT. 
-Only specify if the recipe requires it.
+Only specify if the recipe requires it."""
