@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import instacartLogo from "data-base64:~assets/instacart-logo.png";
 import { Loader2, ExternalLink, Utensils } from "lucide-react";
 import type { Recipe } from "@/types";
-import { send, openTab, ISSUE_FORM_URL } from "@/lib/utils";
+import { send, openTab } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -37,7 +37,7 @@ export default function SidePanel() {
             setPastRecipes(response.data);
         } catch {
             setError(
-                "Something went wrong while fetching past recipes. If the issue persists, please report it using the link below.",
+                "Something went wrong while fetching past recipes. Please try again.",
             );
         } finally {
             setLoading(false);
@@ -56,20 +56,6 @@ export default function SidePanel() {
         return (
             <div className="flex flex-col items-center justify-center h-screen w-screen text-center px-12 space-y-2 text-sm font-light">
                 <p className="text-red-500">{error}</p>
-                <Button
-                    variant="link"
-                    className="h-5 font-light"
-                    onClick={() =>
-                        window.open(
-                            ISSUE_FORM_URL,
-                            "_blank",
-                            "noopener,noreferrer",
-                        )
-                    }
-                >
-                    <ExternalLink />
-                    Report Issue?
-                </Button>
             </div>
         );
     }

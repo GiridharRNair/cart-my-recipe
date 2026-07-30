@@ -26,6 +26,3 @@ export function openTab(url: string) {
     }
     chrome.tabs.create({ url });
 }
-
-export const ISSUE_FORM_URL =
-    "https://docs.google.com/forms/d/e/1FAIpQLSfcuOVlwI4DRcpZGJZqZ9lzro29Mx09PqpnpzsLrevSfY051g/viewform?usp=dialog";

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import instacartLogo from "data-base64:~assets/instacart-logo.png";
-import { Loader2, ExternalLink } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type {
     Recipe,
     InstacartProductLinkUrl,
     InstacartIngredients,
 } from "@/types";
-import { send, openTab, ISSUE_FORM_URL } from "@/lib/utils";
+import { send, openTab } from "@/lib/utils";
 import "@/style.gen.css";
 
 const PARSE_METHODS = [
@@ -133,17 +133,6 @@ export default function Popup() {
                 className="w-full cursor-pointer font-light h-[46px] rounded-3xl"
             >
                 get past recipes
-            </Button>
-
-            <Button
-                variant="link"
-                className="w-full h-5 cursor-pointer font-light text-xs text-center"
-                onClick={() =>
-                    window.open(ISSUE_FORM_URL, "_blank", "noopener,noreferrer")
-                }
-            >
-                <ExternalLink />
-                Report Issue?
             </Button>
         </div>
     );
