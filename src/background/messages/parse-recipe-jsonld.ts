@@ -37,6 +37,8 @@ const handler: PlasmoMessaging.MessageHandler = async (_req, res) => {
             return res.send({ data: null, error: true });
         }
 
+        // JSON-LD is schema-less external data; treat nodes as untyped.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const jsons: any[] = result.result;
 
         const flattened = jsons.flatMap((obj) =>
