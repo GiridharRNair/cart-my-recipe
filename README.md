@@ -95,6 +95,10 @@ GitHub Release is published. Add these repository secrets:
 - Only env vars prefixed `PLASMO_PUBLIC_` are exposed to the extension bundle
 - Popup / side panel / background live directly under `src/`
 
+## License
+
+Released under the [MIT License](LICENSE).
+
 ## Acknowledgements
 
 - [Python Recipe Scraper Package](https://github.com/hhursev/recipe-scrapers)

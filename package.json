@@ -4,6 +4,7 @@
     "version": "1.0.1",
     "description": "Turn any recipe into a grocery delivery!",
     "author": "Giridhar Nair",
+    "license": "MIT",
     "type": "module",
     "private": true,
     "scripts": {
