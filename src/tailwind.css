@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Tailwind v4 is precompiled by the CLI (see package.json scripts) into
+   src/style.gen.css, which the popup/sidepanel import. Scan the source tree
+   for class names. */
+@source "./**/*.{ts,tsx,html}";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

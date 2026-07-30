@@ -1,16 +1,18 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from typing import List, Optional
-from recipe_scrapers import scrape_html
-from fastapi.middleware.cors import CORSMiddleware
-from openai import OpenAI
 import os
 from os.path import join
-from dotenv import load_dotenv
+from typing import List, Optional
+
 import requests
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from openai import OpenAI
+from pydantic import BaseModel, Field
+from recipe_scrapers import scrape_html
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-2024-08-06")
 instacart_server = os.getenv("INSTACART_SERVER")
 instacart_api_key = os.getenv("INSTACART_API_KEY")
 instacart_partner_url = os.getenv("INSTACART_PARTNER_URL")
@@ -65,21 +67,57 @@ class InstacartShoppingList(BaseModel):
     image_url: Optional[str] = None
 
 
+def _safe(fn, default=None):
+    """Call a scraper accessor that may raise on partial/wild-mode pages."""
+    try:
+        return fn()
+    except Exception:
+        return default
+
+
+def _get_scraper(html: str, url: str):
+    """
+    Parse the page with recipe-scrapers.
+
+    Tries the site-specific scraper first; if the site is unsupported, falls
+    back to wild mode, which extracts recipes from schema.org / OpenGraph
+    metadata on arbitrary pages. This meaningfully widens the set of sites
+    we can recognize ingredients from.
+    """
+    try:
+        return scrape_html(html=html, org_url=url)
+    except Exception:
+        return scrape_html(html=html, org_url=url, wild_mode=True)
+
+
+def _extract_ingredients(scraper) -> List[str]:
+    """
+    Prefer structured ingredient groups (dedupes headers/notes cleanly), and
+    fall back to the flat ingredient list.
+    """
+    groups = _safe(scraper.ingredient_groups, default=[]) or []
+    grouped = [item for group in groups for item in (group.ingredients or [])]
+    if grouped:
+        return grouped
+    return _safe(scraper.ingredients, default=[]) or []
+
+
 @app.post("/parse-recipe")
 async def parse_recipe(request: RecipeRequest):
     try:
-        scraper = scrape_html(html=request.html, org_url=request.url)
+        scraper = _get_scraper(request.html, request.url)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error parsing recipe: {str(e)}")
 
-    if not scraper.ingredients():
+    ingredients = _extract_ingredients(scraper)
+    if not ingredients:
         raise HTTPException(status_code=400, detail="No ingredients found.")
 
     return {
-        "title": scraper.title(),
-        "canonical_url": scraper.canonical_url(),
-        "ingredients": scraper.ingredients(),
-        "image_url": scraper.image(),
+        "title": _safe(scraper.title, default=""),
+        "canonical_url": _safe(scraper.canonical_url, default=request.url),
+        "ingredients": ingredients,
+        "image_url": _safe(scraper.image, default=""),
     }
 
 
@@ -94,7 +132,8 @@ async def instacart_ingredients(request: RawIngredients):
         user_prompt = f"Input:\n{request.ingredients}"
 
         response = client.responses.parse(
-            model="gpt-4o-mini-2024-07-18",
+            model=openai_model,
+            temperature=0,
             input=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -115,12 +154,12 @@ async def instacart_shopping_list(request: InstacartShoppingList):
     if not request.ingredients:
         raise HTTPException(status_code=400, detail="No ingredients provided.")
 
-    request = request.model_dump(exclude_none=True)
+    data = request.model_dump(exclude_none=True)
 
     payload = {
-        "title": request["title"],
-        "line_items": request["ingredients"],
-        "image_url": request["image_url"],
+        "title": data["title"],
+        "line_items": data["ingredients"],
+        "image_url": data.get("image_url"),
     }
 
     headers = {

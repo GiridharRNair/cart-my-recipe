@@ -1,17 +1,14 @@
 {
-    "files": [],
-    "references": [
-        {
-            "path": "./tsconfig.app.json"
-        },
-        {
-            "path": "./tsconfig.node.json"
-        }
-    ],
+    "extends": "plasmo/templates/tsconfig.base",
+    "exclude": ["node_modules"],
+    "include": [".plasmo/index.d.ts", "./**/*.ts", "./**/*.tsx"],
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
+            "~*": ["./src/*"],
             "@/*": ["./src/*"]
-        }
+        },
+        "ignoreDeprecations": "6.0",
+        "types": ["chrome", "node"]
     }
 }

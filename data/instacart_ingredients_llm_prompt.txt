@@ -4,6 +4,20 @@ If water is ever included as an ingredient, do not include it in the ingredients
 
 
 
+Ingredient Recognition Instructions
+
+The input is a raw, noisy list of recipe ingredient lines scraped from a webpage. Recognize the underlying grocery product in each line accurately and robustly:
+- Ignore preparation and state instructions that are not part of the product name (e.g. "chopped", "diced", "melted", "softened", "room temperature", "divided", "packed", "sifted", "to taste", "for garnish", "for serving", "plus more").
+- Strip parenthetical notes, brand asides, and substitution hints (e.g. "(optional)", "(about 2 medium)", "or vegetable stock") unless they change which product to buy.
+- For quantity ranges (e.g. "2 to 3 cloves", "1-2 tbsp"), use the larger value so the shopper does not run short.
+- Resolve fractions and unicode fractions (e.g. "½", "1 ¾") to decimals.
+- Combine duplicate lines for the same product into a single line item with the summed quantity.
+- Drop section headers and non-ingredient lines (e.g. "For the sauce:", "Equipment", empty lines).
+- If a line lists a core ingredient plus optional add-ins joined by "or"/"and", keep the primary purchasable product.
+- Never invent ingredients that are not present in the input.
+
+
+
 Naming Instructions
 
 Generate the most accurate grocery-friendly name for an ingredient, optimized for searching a grocery store catalog.

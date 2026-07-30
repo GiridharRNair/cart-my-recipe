@@ -27,10 +27,12 @@ source venv/bin/activate
 npm install   # installs for API + extension
 ```
 
+Copy `.env.example` to `.env` and fill in your `OPENAI_API_KEY` and Instacart credentials.
+
 ### Development
 
 ```bash
-# Start extension dev server
+# Start extension dev server (Plasmo)
 npm run dev
 
 # Start API server
@@ -39,35 +41,51 @@ npm run api
 
 * Open Chrome → `chrome://extensions/`
 * Enable **Developer Mode**
-* Load unpacked extension from the `dist` folder
+* Load unpacked extension from `build/chrome-mv3-dev`
 
 ### Build for Production
 
 ```bash
+# Bundle the extension into build/chrome-mv3-prod
 npm run build
+
+# Zip it for the Chrome Web Store (build/chrome-mv3-prod.zip)
+npm run package
 ```
+
+### Publishing to the Chrome Web Store
+
+Publishing is automated with Plasmo's [BPP](https://github.com/PlasmoHQ/bpp) GitHub
+Action (`.github/workflows/submit.yml`). It runs on `workflow_dispatch` or when a
+GitHub Release is published. Add these repository secrets:
+
+- `SUBMIT_KEYS` — BPP keys JSON (Chrome Web Store `clientId` / `clientSecret` /
+  `refreshToken` and `extId`). See the [BPP docs](https://docs.plasmo.com/framework/workflows/submit).
+- `PLASMO_PUBLIC_BACKEND_API_URL` — production backend URL baked into the build.
 
 ## Project Structure
 
-- `src/popup/` - Extension popup UI
-- `src/content/` - Content scripts
-- `manifest.config.ts` - Chrome extension manifest configuration
+- `src/popup.tsx` — extension popup UI
+- `src/sidepanel.tsx` — side panel (past recipes)
+- `src/background/messages/` — typed background message handlers (`@plasmohq/messaging`)
+- `src/components/ui/` — shadcn/ui components
+- `assets/icon.png` — source icon (Plasmo generates the sized variants)
+- `api/main.py` — FastAPI backend (recipe parsing + Instacart integration)
+- Manifest is configured via the `manifest` key in `package.json`
 
 ## Documentation
 
 - [React Documentation](https://reactjs.org/)
-- [Vite Documentation](https://vitejs.dev/)
-- [CRXJS Documentation](https://crxjs.dev/vite-plugin)
+- [Plasmo Documentation](https://docs.plasmo.com/)
 
 ## Chrome Extension Development Notes
 
-- Use `manifest.config.ts` to configure your extension
-- The CRXJS plugin automatically handles manifest generation
-- Content scripts should be placed in `src/content/`
-- Popup UI should be placed in `src/popup/`
+- Plasmo generates the manifest from file conventions + the `manifest` key in `package.json`
+- Only env vars prefixed `PLASMO_PUBLIC_` are exposed to the extension bundle
+- Popup / side panel / background live directly under `src/`
 
 ## Acknowledgements
 
 - [Python Recipe Scraper Package](https://github.com/hhursev/recipe-scrapers)
 - [Ben Awad’s Recipe Scraping Article](https://www.benawad.com/scraping-recipe-websites/)
-- [CRXJS](https://crxjs.dev/)
+- [Plasmo](https://www.plasmo.com/)

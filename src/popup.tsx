@@ -1,27 +1,27 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import instacartLogo from "data-base64:~assets/instacart-logo.png";
 import { Loader2, ExternalLink } from "lucide-react";
-import {
+import { Button } from "@/components/ui/button";
+import type {
     Recipe,
-    ChromeListener,
     InstacartProductLinkUrl,
     InstacartIngredients,
 } from "@/types";
-import InstacartLogo from "@/assets/instacart-logo.png";
-import { sendChromeMessage, ISSUE_FORM_URL } from "@/lib/utils";
+import { send, openTab, ISSUE_FORM_URL } from "@/lib/utils";
+import "@/style.gen.css";
 
 const PARSE_METHODS = [
-    "PARSE_RECIPE_BACKEND",
-    "PARSE_RECIPE_JSONLD",
-    "PARSE_RECIPE_HTML",
+    "parse-recipe-backend",
+    "parse-recipe-jsonld",
+    "parse-recipe-html",
 ];
 
-export default function App() {
+export default function Popup() {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    async function handleError(message: string) {
+    function handleError(message: string) {
         setError(message);
         setLoading(false);
     }
@@ -35,12 +35,9 @@ export default function App() {
             let recipe: Recipe | null = null;
 
             for (const method of PARSE_METHODS) {
-                const parseRecipeRes = await sendChromeMessage<ChromeListener>({
-                    action: method,
-                });
-
-                if (!parseRecipeRes.error) {
-                    recipe = parseRecipeRes.data as Recipe;
+                const parseRecipeRes = await send<Recipe>(method);
+                if (!parseRecipeRes.error && parseRecipeRes.data) {
+                    recipe = parseRecipeRes.data;
                     break;
                 }
             }
@@ -50,42 +47,33 @@ export default function App() {
             }
 
             setStatus("processing ingredients");
-            const ingredientsRes = await sendChromeMessage<ChromeListener>({
-                action: "INSTACART_INGREDIENTS",
-                ingredients: recipe.ingredients,
-            });
+            const ingredientsRes = await send<InstacartIngredients>(
+                "instacart-ingredients",
+                { ingredients: recipe.ingredients },
+            );
 
-            if (ingredientsRes.error) {
+            if (ingredientsRes.error || !ingredientsRes.data) {
                 return handleError("Failed to process ingredients");
             }
 
-            const instacartIngredients: InstacartIngredients =
-                ingredientsRes.data as InstacartIngredients;
-
             recipe = {
                 ...recipe,
-                ingredients: instacartIngredients.ingredients,
+                ingredients: ingredientsRes.data.ingredients,
             };
 
             setStatus("generating shopping list");
-            const shoppingListRes = await sendChromeMessage<ChromeListener>({
-                action: "INSTACART_SHOPPING_LIST",
-                shoppingList: recipe,
-            });
+            const shoppingListRes = await send<InstacartProductLinkUrl>(
+                "instacart-shopping-list",
+                { shoppingList: recipe },
+            );
 
-            if (shoppingListRes.error) {
+            if (shoppingListRes.error || !shoppingListRes.data) {
                 return handleError("Failed to create shopping list");
             }
 
             setStatus("redirecting to Instacart");
-            const shoppingList: InstacartProductLinkUrl =
-                shoppingListRes.data as InstacartProductLinkUrl;
-
-            await sendChromeMessage({
-                action: "OPEN_INSTACART_PAGE",
-                url: shoppingList.products_link_url,
-            });
-        } catch (err) {
+            openTab(shoppingListRes.data.products_link_url);
+        } catch {
             handleError("An unexpected error occurred");
         } finally {
             setLoading(false);
@@ -130,7 +118,7 @@ export default function App() {
                 ) : (
                     <>
                         <img
-                            src={InstacartLogo}
+                            src={instacartLogo}
                             alt="Instacart Logo"
                             className="w-[22px]"
                         />

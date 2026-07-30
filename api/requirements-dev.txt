@@ -3,3 +3,4 @@ recipe-scrapers==15.9.0
 ruff==0.12.8
 openai==1.99.7
 python-dotenv==1.1.1
+requests==2.32.4

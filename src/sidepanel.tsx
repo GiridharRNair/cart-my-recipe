@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Recipe, ChromeListener } from "@/types";
-import { sendChromeMessage, ISSUE_FORM_URL } from "@/lib/utils";
+import instacartLogo from "data-base64:~assets/instacart-logo.png";
+import { Loader2, ExternalLink, Utensils } from "lucide-react";
+import type { Recipe } from "@/types";
+import { send, openTab, ISSUE_FORM_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { ExternalLink, Utensils } from "lucide-react";
 import {
     Card,
     CardHeader,
@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import InstacartLogo from "@/assets/instacart-logo.png";
+import "@/style.gen.css";
 
-export default function App() {
+export default function SidePanel() {
     const [pastRecipes, setPastRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -28,34 +28,19 @@ export default function App() {
         setLoading(true);
         setError(null);
         try {
-            const response = await sendChromeMessage<ChromeListener>({
-                action: "GET_PAST_RECIPES",
-            });
+            const response = await send<Recipe[]>("get-past-recipes");
 
-            if (response.error) {
+            if (response.error || !response.data) {
                 throw new Error("Failed to fetch past recipes");
             }
 
-            const recipes = response.data as Recipe[];
-
-            setPastRecipes(recipes);
-        } catch (err) {
+            setPastRecipes(response.data);
+        } catch {
             setError(
                 "Something went wrong while fetching past recipes. If the issue persists, please report it using the link below.",
             );
         } finally {
             setLoading(false);
-        }
-    }
-
-    async function openInstacartLink(instacartUrl: string) {
-        try {
-            await sendChromeMessage<ChromeListener>({
-                action: "OPEN_INSTACART_PAGE",
-                url: instacartUrl,
-            });
-        } catch (error) {
-            console.error("Error opening Instacart link:", error);
         }
     }
 
@@ -142,7 +127,7 @@ export default function App() {
 
                             <Button
                                 onClick={() =>
-                                    openInstacartLink(
+                                    openTab(
                                         recipe.instacart_products_link_url!,
                                     )
                                 }
@@ -151,7 +136,7 @@ export default function App() {
                                 variant={"outline"}
                             >
                                 <img
-                                    src={InstacartLogo}
+                                    src={instacartLogo}
                                     alt="Instacart Logo"
                                     className="w-[13px] mr-1"
                                 />
@@ -170,10 +155,8 @@ export default function App() {
                                 className="w-full h-8 text-xs font-light cursor-pointer"
                                 variant={"outline"}
                             >
-                                <>
-                                    <ExternalLink className="h-3 w-3 mr-1" />
-                                    Go to recipe
-                                </>
+                                <ExternalLink className="h-3 w-3 mr-1" />
+                                Go to recipe
                             </Button>
                         </CardContent>
                     </Card>

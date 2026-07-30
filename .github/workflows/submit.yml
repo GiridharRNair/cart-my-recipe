@@ -1,0 +1,36 @@
+name: "Submit to Chrome Web Store"
+
+# Publish a new version to the Chrome Web Store.
+# Trigger manually, or automatically when a GitHub Release is published.
+on:
+    workflow_dispatch:
+    release:
+        types: [published]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci --ignore-scripts
+
+            - name: Build the extension
+              run: npm run build
+              env:
+                  PLASMO_PUBLIC_BACKEND_API_URL: ${{ secrets.PLASMO_PUBLIC_BACKEND_API_URL }}
+
+            - name: Package the extension into a zip artifact
+              run: npm run package
+
+            - name: Browser Platform Publish
+              uses: PlasmoHQ/bpp@v3
+              with:
+                  keys: ${{ secrets.SUBMIT_KEYS }}
+                  artifact: build/chrome-mv3-prod.zip

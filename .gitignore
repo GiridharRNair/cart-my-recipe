@@ -261,3 +261,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Plasmo build output
+build/
+
+# Tailwind CLI generated stylesheet
+src/style.gen.css
+
+# tsc incremental build info
+*.tsbuildinfo
