@@ -96,7 +96,7 @@ export default function SidePanel() {
                                     <img
                                         src={recipe.image_url}
                                         alt={recipe.title}
-                                        className="w-18 h-18 rounded-md object-cover flex-shrink-0"
+                                        className="w-18 h-18 rounded-md object-cover shrink-0"
                                     />
                                 )}
                             </div>
@@ -122,7 +122,7 @@ export default function SidePanel() {
                                 <img
                                     src={instacartLogo}
                                     alt="Instacart Logo"
-                                    className="w-[13px] mr-1"
+                                    className="w-3.25 mr-1"
                                 />
                                 Shop on Instacart
                             </Button>
