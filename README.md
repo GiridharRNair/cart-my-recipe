@@ -1,9 +1,7 @@
 
 Chrome extension that lets you order ingredients from online recipes directly through Instacart.
 
-🎥 [Demo Video](https://www.youtube.com/watch?v=CmE-I-yH8jo)
-
-https://chromewebstore.google.com/detail/cart-my-recipe/fbnbcmkopjplpopnjmohjfnphlaaldph?authuser=0&hl=en
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fbnbcmkopjplpopnjmohjfnphlaaldph?label=Chrome%20Web%20Store&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/cart-my-recipe/fbnbcmkopjplpopnjmohjfnphlaaldph)
 
 ## Quick Start
 
@@ -73,27 +71,6 @@ GitHub Release is published. Add these repository secrets:
 - `SUBMIT_KEYS` — BPP keys JSON (Chrome Web Store `clientId` / `clientSecret` /
   `refreshToken` and `extId`). See the [BPP docs](https://docs.plasmo.com/framework/workflows/submit).
 - `PLASMO_PUBLIC_BACKEND_API_URL` — production backend URL baked into the build.
-
-## Project Structure
-
-- `src/popup.tsx` — extension popup UI
-- `src/sidepanel.tsx` — side panel (past recipes)
-- `src/background/messages/` — typed background message handlers (`@plasmohq/messaging`)
-- `src/components/ui/` — shadcn/ui components
-- `assets/icon.png` — source icon (Plasmo generates the sized variants)
-- `api/main.py` — FastAPI backend (recipe parsing + Instacart integration)
-- Manifest is configured via the `manifest` key in `package.json`
-
-## Documentation
-
-- [React Documentation](https://reactjs.org/)
-- [Plasmo Documentation](https://docs.plasmo.com/)
-
-## Chrome Extension Development Notes
-
-- Plasmo generates the manifest from file conventions + the `manifest` key in `package.json`
-- Only env vars prefixed `PLASMO_PUBLIC_` are exposed to the extension bundle
-- Popup / side panel / background live directly under `src/`
 
 ## License
 
