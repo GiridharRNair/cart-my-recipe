@@ -1,4 +1,3 @@
-
 Chrome extension that lets you order ingredients from online recipes directly through Instacart.
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fbnbcmkopjplpopnjmohjfnphlaaldph?label=Chrome%20Web%20Store&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/cart-my-recipe/fbnbcmkopjplpopnjmohjfnphlaaldph)
@@ -7,8 +6,8 @@ Chrome extension that lets you order ingredients from online recipes directly th
 
 ### Prerequisites
 
-* Node.js
-* Python
+- Node.js
+- Python
 
 ### Setup
 
@@ -40,9 +39,9 @@ npm run dev
 npm run api
 ```
 
-* Open Chrome → `chrome://extensions/`
-* Enable **Developer Mode**
-* Load unpacked extension from `build/chrome-mv3-dev`
+- Open Chrome → `chrome://extensions/`
+- Enable **Developer Mode**
+- Load unpacked extension from `build/chrome-mv3-dev`
 
 ### Build for Production
 

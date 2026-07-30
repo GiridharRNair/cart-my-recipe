@@ -113,9 +113,7 @@ export default function SidePanel() {
 
                             <Button
                                 onClick={() =>
-                                    openTab(
-                                        recipe.instacart_products_link_url!,
-                                    )
+                                    openTab(recipe.instacart_products_link_url!)
                                 }
                                 size="sm"
                                 className="w-full h-8 text-xs font-light cursor-pointer"
