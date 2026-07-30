@@ -2,11 +2,11 @@ import logging
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Annotated, List, Optional
+from typing import Annotated, List, Optional, cast
 
 import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 from pydantic import BaseModel, Field
@@ -78,9 +78,15 @@ limiter = Limiter(
     headers_enabled=True,
 )
 
+
+def rate_limit_handler(request: Request, exc: Exception) -> Response:
+    """Adapter matching Starlette's exception-handler signature."""
+    return _rate_limit_exceeded_handler(request, cast(RateLimitExceeded, exc))
+
+
 app = FastAPI()
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
 
 app.add_middleware(
     CORSMiddleware,
