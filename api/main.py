@@ -56,7 +56,16 @@ SHOPPING_LIST_LIMIT = os.getenv("RATE_LIMIT_SHOPPING_LIST", "20/minute")
 
 
 def get_client_ip(request: Request) -> str:
-    """Real client IP, honoring Vercel's proxy X-Forwarded-For header."""
+    """
+    Real client IP for rate limiting.
+
+    Prefer Vercel's x-real-ip, which the platform sets from the connecting
+    socket and a client cannot forge. Fall back to the first X-Forwarded-For
+    entry, then the socket peer, for non-Vercel/local runs.
+    """
+    real_ip = request.headers.get("x-real-ip")
+    if real_ip:
+        return real_ip.strip()
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded:
         return forwarded.split(",")[0].strip()
