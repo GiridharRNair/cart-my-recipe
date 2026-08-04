@@ -1,18 +1,15 @@
 import logging
 import os
-from typing import Annotated, List, Optional, cast
+from typing import Annotated, List, Optional
 
 import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 from prompt import SYSTEM_PROMPT
 from pydantic import BaseModel, Field
 from recipe_scrapers import scrape_html
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
 
 load_dotenv()
 
@@ -32,46 +29,10 @@ allowed_origins = [
 # Outbound HTTP timeout (seconds) so a slow Instacart call can't hang the worker.
 INSTACART_TIMEOUT = float(os.getenv("INSTACART_TIMEOUT", "15"))
 
-# Per-endpoint rate limits (env-overridable). On serverless (Vercel) the default
-# in-memory store is per-instance/best-effort; set RATE_LIMIT_STORAGE_URI to a
-# shared store (e.g. Upstash Redis: redis://...) for durable, distributed limits.
-PARSE_LIMIT = os.getenv("RATE_LIMIT_PARSE", "20/minute")
-INGREDIENTS_LIMIT = os.getenv("RATE_LIMIT_INGREDIENTS", "20/minute")
-SHOPPING_LIST_LIMIT = os.getenv("RATE_LIMIT_SHOPPING_LIST", "20/minute")
-
-
-def get_client_ip(request: Request) -> str:
-    """
-    Real client IP for rate limiting.
-
-    Prefer Vercel's x-real-ip, which the platform sets from the connecting
-    socket and a client cannot forge. Fall back to the first X-Forwarded-For
-    entry, then the socket peer, for non-Vercel/local runs.
-    """
-    real_ip = request.headers.get("x-real-ip")
-    if real_ip:
-        return real_ip.strip()
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return get_remote_address(request)
-
-
-limiter = Limiter(
-    key_func=get_client_ip,
-    storage_uri=os.getenv("RATE_LIMIT_STORAGE_URI", "memory://"),
-    headers_enabled=True,
-)
-
-
-def rate_limit_handler(request: Request, exc: Exception) -> Response:
-    """Adapter matching Starlette's exception-handler signature."""
-    return _rate_limit_exceeded_handler(request, cast(RateLimitExceeded, exc))
-
+# NOTE: Rate limiting is enforced at the edge by Vercel Firewall rules
+# (configured in the Vercel dashboard), not in application code.
 
 app = FastAPI()
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -167,8 +128,7 @@ async def health():
 
 
 @app.post("/parse-recipe")
-@limiter.limit(PARSE_LIMIT)
-async def parse_recipe(request: Request, payload: RecipeRequest):
+async def parse_recipe(payload: RecipeRequest):
     try:
         scraper = _get_scraper(payload.html, payload.url)
     except Exception:
@@ -188,8 +148,7 @@ async def parse_recipe(request: Request, payload: RecipeRequest):
 
 
 @app.post("/instacart-ingredients")
-@limiter.limit(INGREDIENTS_LIMIT)
-async def instacart_ingredients(request: Request, payload: RawIngredients):
+async def instacart_ingredients(payload: RawIngredients):
     if not payload.ingredients:
         raise HTTPException(status_code=400, detail="No ingredients provided.")
 
@@ -210,8 +169,7 @@ async def instacart_ingredients(request: Request, payload: RawIngredients):
 
 
 @app.post("/instacart-shopping-list")
-@limiter.limit(SHOPPING_LIST_LIMIT)
-async def instacart_shopping_list(request: Request, payload: InstacartShoppingList):
+async def instacart_shopping_list(payload: InstacartShoppingList):
     if not payload.title:
         raise HTTPException(status_code=400, detail="No title provided.")
 
