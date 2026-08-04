@@ -4,7 +4,7 @@ Turn any online recipe into an Instacart cart in one click.
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fbnbcmkopjplpopnjmohjfnphlaaldph?label=Chrome%20Web%20Store&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/cart-my-recipe/fbnbcmkopjplpopnjmohjfnphlaaldph)
 
-![Cart My Recipe demo](docs/demo.jpg)
+![Cart My Recipe demo](docs/demo.gif)
 
 ## How it works
 
