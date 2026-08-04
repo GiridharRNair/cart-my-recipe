@@ -1,6 +1,18 @@
-Chrome extension that lets you order ingredients from online recipes directly through Instacart.
+# Cart My Recipe
+
+Turn any online recipe into an Instacart cart in one click.
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fbnbcmkopjplpopnjmohjfnphlaaldph?label=Chrome%20Web%20Store&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/cart-my-recipe/fbnbcmkopjplpopnjmohjfnphlaaldph)
+
+![Cart My Recipe demo](docs/demo.jpg)
+
+## How it works
+
+1. Open a recipe page in Chrome.
+2. Click the Cart My Recipe icon.
+3. It reads the ingredients and opens a ready-to-shop Instacart cart.
+
+Recipes you've ordered are saved in the side panel, so you can reorder them anytime.
 
 ## Quick Start
 
@@ -13,7 +25,7 @@ Chrome extension that lets you order ingredients from online recipes directly th
 
 ```bash
 # Clone the repo
-git clone GiridharRNair/cart-my-recipe
+git clone https://github.com/GiridharRNair/cart-my-recipe.git
 cd cart-my-recipe
 
 # Python virtual environment
@@ -27,56 +39,52 @@ npm install
 npm run install-api-dependencies
 ```
 
-Copy `.env.example` to `.env` and fill in your `OPENAI_API_KEY` and Instacart credentials.
+Copy `.env.example` to `.env` and add your `OPENAI_API_KEY` and Instacart credentials.
 
 ### Development
 
 ```bash
-# Start extension dev server (Plasmo)
-npm run dev
-
-# Start API server
-npm run api
+npm run dev   # extension dev server (Plasmo)
+npm run api   # backend API server
 ```
 
-- Open Chrome → `chrome://extensions/`
-- Enable **Developer Mode**
-- Load unpacked extension from `build/chrome-mv3-dev`
+Then load the extension in Chrome:
 
-### Build for Production
+1. Go to `chrome://extensions/`
+2. Turn on **Developer mode**
+3. Click **Load unpacked** and select the `build/chrome-mv3-dev` folder
+
+### Build
 
 ```bash
-# Bundle the extension into build/chrome-mv3-prod
-npm run build
-
-# Zip it for the Chrome Web Store (build/chrome-mv3-prod.zip)
-npm run package
+npm run build     # bundle to build/chrome-mv3-prod
+npm run package   # zip it for the Chrome Web Store
 ```
 
-### Formatting & Linting
+### Format & lint
 
 ```bash
-npm run format       # Prettier over the extension source
-npm run format-api   # Ruff formatter over the backend
-npm run lint-api     # Ruff lint over the backend
+npm run format       # format the extension code
+npm run lint         # lint the extension code
+npm run format-api   # format the backend
+npm run lint-api     # lint the backend
 ```
 
-### Publishing to the Chrome Web Store
+## Publishing
 
-Publishing is automated with Plasmo's [BPP](https://github.com/PlasmoHQ/bpp) GitHub
-Action (`.github/workflows/submit.yml`). It runs on `workflow_dispatch` or when a
-GitHub Release is published. Add these repository secrets:
+New releases publish to the Chrome Web Store automatically through Plasmo's
+[BPP](https://github.com/PlasmoHQ/bpp) action (`.github/workflows/submit.yml`),
+which runs when a GitHub Release is published. It needs two repository secrets:
 
-- `SUBMIT_KEYS` — BPP keys JSON (Chrome Web Store `clientId` / `clientSecret` /
-  `refreshToken` and `extId`). See the [BPP docs](https://docs.plasmo.com/framework/workflows/submit).
-- `PLASMO_PUBLIC_BACKEND_API_URL` — production backend URL baked into the build.
+- `SUBMIT_KEYS` — Chrome Web Store API keys ([how to get them](https://docs.plasmo.com/framework/workflows/submit))
+- `PLASMO_PUBLIC_BACKEND_API_URL` — the production backend URL
 
 ## License
 
-Released under the [MIT License](LICENSE).
+[MIT](LICENSE)
 
 ## Acknowledgements
 
-- [Python Recipe Scraper Package](https://github.com/hhursev/recipe-scrapers)
-- [Ben Awad’s Recipe Scraping Article](https://www.benawad.com/scraping-recipe-websites/)
+- [recipe-scrapers](https://github.com/hhursev/recipe-scrapers)
+- [Ben Awad's recipe scraping article](https://www.benawad.com/scraping-recipe-websites/)
 - [Plasmo](https://www.plasmo.com/)
