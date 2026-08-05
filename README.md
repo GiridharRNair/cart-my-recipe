@@ -14,6 +14,19 @@ Turn any online recipe into an Instacart cart in one click.
 
 Recipes you've ordered are saved in the side panel, so you can reorder them anytime.
 
+## Under the hood
+
+When you click the extension, it reads the recipe page's HTML and sends it to a
+small API. The API pulls out the ingredient list, uses an LLM to turn each raw
+line into a clean, shoppable item, and asks Instacart to build a cart. The cart
+link then opens in a new tab.
+
+Built with:
+
+- **Extension:** [Plasmo](https://www.plasmo.com/), React, TypeScript, Tailwind CSS, shadcn/ui
+- **API:** FastAPI (Python), deployed on Vercel
+- **Services:** OpenAI (structured ingredient parsing), [recipe-scrapers](https://github.com/hhursev/recipe-scrapers), and the Instacart Developer Platform
+
 ## Quick Start
 
 ### Prerequisites
