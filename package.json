@@ -1,7 +1,7 @@
 {
     "name": "cart-my-recipe",
     "displayName": "Cart My Recipe",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Turn any recipe into a grocery delivery!",
     "author": "Giridhar Nair",
     "license": "MIT",
