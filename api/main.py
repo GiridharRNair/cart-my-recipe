@@ -15,8 +15,24 @@ load_dotenv()
 
 logger = logging.getLogger("cart-my-recipe")
 
+
+def _optional_float(name: str) -> Optional[float]:
+    """Parse an optional numeric env var, returning None when unset/blank."""
+    raw = os.getenv(name)
+    if not raw or not raw.strip():
+        return None
+    try:
+        return float(raw)
+    except ValueError:
+        logger.warning("Ignoring invalid %s=%r (must be a number)", name, raw)
+        return None
+
+
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-2024-08-06")
+# Some models (e.g. reasoning models) reject a non-default temperature, so it is
+# only sent when OPENAI_TEMPERATURE is explicitly set.
+openai_temperature = _optional_float("OPENAI_TEMPERATURE")
 instacart_server = os.getenv("INSTACART_SERVER")
 instacart_api_key = os.getenv("INSTACART_API_KEY")
 instacart_partner_url = os.getenv("INSTACART_PARTNER_URL")
@@ -153,14 +169,18 @@ async def instacart_ingredients(payload: RawIngredients):
         raise HTTPException(status_code=400, detail="No ingredients provided.")
 
     try:
+        extra = {}
+        if openai_temperature is not None:
+            extra["temperature"] = openai_temperature
+
         response = client.responses.parse(
             model=openai_model,
-            temperature=0,
             input=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"Input:\n{payload.ingredients}"},
             ],
             text_format=InstacartIngredients,
+            **extra,
         )
         return response.output_parsed
     except Exception:
