@@ -55,6 +55,7 @@
         "typescript-eslint": "^8.20.0"
     },
     "manifest": {
+        "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArCLGrNjtHSHmMatIpix7YpwFYsCbXF/0cBtgbRzx7fw7gF2MzeUO1rqM5JZjk08EqljnALXzdXr2O2Z8Wtn+sP/yb6NcLqdhKXz0KCev0haoqCm7fNpoHs175QZsuYl+2JDZJJ1IcWEapiZk7P5TDXW8celI8zqRKPOU0PQ1/Fel6sTo8gj+B1PyXSSDsBW3y5gCjBsghbFoFl9xYBHxEIhijxIQ/jbG/bUqMoY865Cb19/0YPzax1aMPg/hgZmIAuOdcKuVl4rQDnsfkL7hq3viPtlc8aNu6jHTMDf4hc9yc2D6mFrKyeFhtn3usEKd0PNRpCVj9fqNUdMkX/Xr6QIDAQAB",
         "permissions": [
             "sidePanel",
             "activeTab",
