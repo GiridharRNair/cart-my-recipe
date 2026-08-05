@@ -24,7 +24,7 @@ jobs:
             - name: Build the extension
               run: npm run build
               env:
-                  PLASMO_PUBLIC_BACKEND_API_URL: ${{ secrets.PLASMO_PUBLIC_BACKEND_API_URL }}
+                  PLASMO_PUBLIC_BACKEND_API_URL: https://cart-my-recipe.vercel.app
 
             - name: Package the extension into a zip artifact
               run: npm run package
