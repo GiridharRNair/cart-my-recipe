@@ -1,7 +1,7 @@
 {
     "name": "cart-my-recipe",
     "displayName": "Cart My Recipe",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Turn any recipe into a grocery delivery!",
     "author": "Giridhar Nair",
     "license": "MIT",
@@ -33,6 +33,7 @@
         "plasmo": "^0.90.5",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
+        "svgo": "^3.3.4",
         "tailwind-merge": "^3.3.1"
     },
     "devDependencies": {
