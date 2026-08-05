@@ -70,21 +70,6 @@ npm run format-api   # format the backend
 npm run lint-api     # lint the backend
 ```
 
-## Publishing
-
-New releases publish to the Chrome Web Store automatically through Plasmo's
-[BPP](https://github.com/PlasmoHQ/bpp) action (`.github/workflows/submit.yml`),
-which runs when a GitHub Release is published. It needs two repository secrets:
-
-- `SUBMIT_KEYS` — Chrome Web Store API keys ([how to get them](https://docs.plasmo.com/framework/workflows/submit))
-- `PLASMO_PUBLIC_BACKEND_API_URL` — the production backend URL
-
 ## License
 
 [MIT](LICENSE)
-
-## Acknowledgements
-
-- [recipe-scrapers](https://github.com/hhursev/recipe-scrapers)
-- [Ben Awad's recipe scraping article](https://www.benawad.com/scraping-recipe-websites/)
-- [Plasmo](https://www.plasmo.com/)
