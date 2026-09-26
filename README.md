@@ -4,10 +4,6 @@ Turn any online recipe into an Instacart cart in one click.
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fbnbcmkopjplpopnjmohjfnphlaaldph?label=Chrome%20Web%20Store&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/cart-my-recipe/fbnbcmkopjplpopnjmohjfnphlaaldph)
 
-![Cart My Recipe demo](docs/demo.gif)
-
-## How it works
-
 1. Open a recipe page in Chrome.
 2. Click the Cart My Recipe icon.
 3. The extension finds the page's ingredients, normalizes them into Instacart
@@ -15,51 +11,9 @@ Turn any online recipe into an Instacart cart in one click.
 
 Recipes you've ordered are saved in the side panel, so you can reorder them anytime.
 
-## Under the hood
+![Cart My Recipe demo](docs/demo.gif)
 
-Cart My Recipe is split into a Chrome extension and a small FastAPI backend.
-When you click the popup, the extension parses the active tab, sends raw
-ingredients to the API, gets back Instacart-ready line items, creates a shopping
-list link, opens it in a new tab, and saves the recipe in `chrome.storage.local`
-for the side panel.
-
-### Recipe parsing fallbacks
-
-The app tries these parsing fallbacks in order:
-
-1. **`recipe-scrapers` site parser:** the backend parses the page HTML with the
-   scraper for known recipe sites.
-2. **`recipe-scrapers` wild mode:** if the site parser fails, the backend tries
-   wild mode for Schema.org, JSON-LD, Microdata, RDFa, and OpenGraph metadata.
-3. **Client JSON-LD:** if the backend cannot parse the page, the extension
-   reads `script[type="application/ld+json"]` and looks for a `Recipe` object.
-4. **Client HTML heuristics:** as a last resort, the extension scans common
-   ingredient selectors and list items that look like ingredient lines.
-
-On the backend path, grouped ingredients are preferred and the flat ingredient
-list is used as a fallback. These fallbacks help with unsupported recipe sites,
-but they do not bypass paywalls, bot protection, login walls, or inaccessible
-page content.
-
-### Ingredient normalization
-
-`/instacart-ingredients` uses OpenAI structured outputs with a Pydantic schema
-to turn noisy recipe lines into validated Instacart line items. The prompt asks
-the model to remove preparation notes, drop section headers and water, convert
-fractions and ranges, combine duplicates, choose grocery-searchable names, use
-Instacart-supported units, and only add brand or health filters when required.
-UPCs are intentionally not invented.
-
-### Instacart shopping list schema
-
-`/instacart-shopping-list` sends Instacart a `title`, optional `image_url`, and
-`line_items`. Each line item includes a required `name` plus optional fields
-such as `quantity`, `unit`, `display_text`, `line_item_measurements`, `filters`,
-and `upcs`. Successful responses return `products_link_url`; if
-`INSTACART_PARTNER_URL` is set, the backend appends that suffix before returning
-the URL.
-
-Built with:
+## Technologies Used 
 
 - **Extension:** [Plasmo](https://www.plasmo.com/), React, TypeScript, Tailwind CSS, shadcn/ui
 - **API:** FastAPI (Python), deployed on Vercel
